@@ -9,7 +9,6 @@
 [ext_resource path="res://sources/gui/FloatingWindows.gd" type="Script" id=7]
 
 [node name="CanvasLayer" type="CanvasLayer"]
-layer = 0
 follow_viewport_enable = true
 script = ExtResource( 3 )
 
