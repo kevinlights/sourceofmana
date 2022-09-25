@@ -1,6 +1,6 @@
 extends Node
 
-onready var weightStat		= $FloatingWindows/Inventory/VBoxContainer/Weight/BgTex/Weight
+@onready var weightStat		= $FloatingWindows/Inventory/VBoxContainer/Weight/BgTex/Weight
 
 #
 func ToggleControl(control : Control):
@@ -23,7 +23,12 @@ func _process(_delta):
 
 	if Input.is_action_just_pressed(Actions.ACTION_UI_QUIT_GAME): ToggleControl($FloatingWindows/Quit)
 	if Input.is_action_just_pressed(Actions.ACTION_UI_INVENTORY): ToggleControl($FloatingWindows/Inventory)
+	if Input.is_action_just_pressed(Actions.ACTION_UI_MINIMAP): ToggleControl($FloatingWindows/Minimap)
+	if Input.is_action_just_pressed(Actions.ACTION_UI_CHAT): ToggleControl($FloatingWindows/Chat)
 
 func _notification(notif):
-	if notif == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+	if notif == Node.NOTIFICATION_WM_CLOSE_REQUEST:
 		ToggleControl($FloatingWindows/Quit)
+	elif notif == Node.NOTIFICATION_WM_MOUSE_EXIT:
+		if has_node("FloatingWindows"):
+			get_node("FloatingWindows").ClearWindowsModifier()

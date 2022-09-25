@@ -15,26 +15,33 @@ func Stop():
 	if audioPlayer.is_playing():
 		audioPlayer.Stop()
 
-func Load(name : String):
+func Load(soundName : String):
 	if audioPlayer == null:
 		audioPlayer = Launcher.World.get_node("AudioStreamPlayer")
 
 	assert(audioPlayer, "AudioStreamPlayer could not be found")
 
-	if audioPlayer && currentTrack != name:
-		if name.empty() == false && Launcher.DB.MusicsDB[name] != null:
-			var path = Launcher.Path.MusicRsc + Launcher.DB.MusicsDB[name]._path
-			if path.empty() == false:
-				var stream : AudioStreamOGGVorbis = load(path)
-				stream.set_loop(true)
+	if audioPlayer && currentTrack != soundName && not soundName.is_empty() && Launcher.DB.MusicsDB[soundName] != null:
+		var soundStream : Resource = Launcher.FileSystem.LoadMusic(Launcher.DB.MusicsDB[soundName]._path)
+		Launcher.Util.Assert(soundStream != null, "Could not load music: " + soundName)
+		if soundStream != null:
+			soundStream.set_loop(true)
 
-				audioPlayer.stream	= stream
-				currentTrack		= name
+			audioPlayer.stream	= soundStream
+			currentTrack		= soundName
 
-				audioPlayer.set_autoplay(true)
-				audioPlayer.play()
+			audioPlayer.set_autoplay(true)
+			audioPlayer.play()
 
-func _ready():
-	if audioPlayer == null:
-		audioPlayer = AudioStreamPlayer.new()
-		get_tree().get_root().add_child(audioPlayer)
+func Warped():
+	if Launcher.Map.activeMap && Launcher.Map.activeMap.has_meta("music"):
+		Load(Launcher.Map.activeMap.get_meta("music"))
+
+#
+func _post_ready():
+	audioPlayer = Launcher.World.get_node("AudioStreamPlayer")
+	Launcher.Util.Assert(audioPlayer != null, "Could not find the AudioStreamPlayer instance")
+
+	if Launcher.Map:
+		Launcher.Map.PlayerWarped.connect(self.Warped)
+		Warped()

@@ -1,16 +1,16 @@
 extends Control
 
-export(Texture)			var textureProgress
-export(Texture)			var textureBackground
-export(Color)			var labelColor
-export(String)			var labelUnit
-export(float)			var labelScale
-export(float)			var delayToFillSec
-export(float)			var delayToInitSec
-export(int)				var precisionDivider
+@export var textureProgress : Texture2D
+@export var textureBackground : Texture2D
+@export var labelColor : Color
+@export var labelUnit : String
+@export var labelScale : float
+@export var delayToFillSec : float
+@export var delayToInitSec : float
+@export var precisionDivider : int
 
-onready var label		= get_node("Label")
-onready var bar			= get_node("Bar")
+@onready var label		= get_node("Label")
+@onready var bar		= get_node("Bar")
 
 var isUpdating			= false
 var remainsToFillSec	= 0.0
@@ -41,8 +41,8 @@ func GetFormatedText(value : String) -> String:
 	return value
 
 func GetBarFormat(currentValue : float, maxValue : float) -> String:
-	var currentValueText = GetFormatedText(currentValue as String)
-	var maxValueText = GetFormatedText(maxValue as String)
+	var currentValueText = GetFormatedText(String.num(currentValue))
+	var maxValueText = GetFormatedText(String.num(maxValue))
 
 	var formatedText = currentValueText + " / " + maxValueText
 	if labelUnit.length() > 0:
@@ -53,30 +53,31 @@ func GetBarFormat(currentValue : float, maxValue : float) -> String:
 #
 func SetStat(newValue, maxValue):
 	assert(bar && label, "ProgressBar childs are missing")
+	if valueTo != newValue || valueMax != maxValue:
+		valueFrom = bar.get_value()
+		valueTo = newValue
+		isUpdating = true
+		valueMax = maxValue
 
-	valueFrom = bar.get_value()
-	valueTo = newValue
-	isUpdating = true
-	valueMax = maxValue
-	if valueFrom == 0:
-		remainsToFillSec = delayToInitSec
-		initDelayToFillSec = delayToInitSec
-	else:
-		remainsToFillSec = delayToFillSec
-		initDelayToFillSec = delayToFillSec
+		if valueFrom == 0:
+			remainsToFillSec = delayToInitSec
+			initDelayToFillSec = delayToInitSec
+		else:
+			remainsToFillSec = delayToFillSec
+			initDelayToFillSec = delayToFillSec
 
-	UpdateValue(0)
+		UpdateValue(0)
 
 func UpdateValue(delta):
 	if isUpdating:
 		remainsToFillSec -= delta
 
-		var ratioToFinish : float = 0
+		var ratioToFinish : float = 0.0
 		if initDelayToFillSec != 0:
 			ratioToFinish = (initDelayToFillSec - remainsToFillSec) / initDelayToFillSec
 			ratioToFinish = ease(ratioToFinish, 0.3)
 
-		var newValue = lerp(valueFrom, valueTo, ratioToFinish)
+		var newValue = lerpf(float(valueFrom), float(valueTo), ratioToFinish)
 		if bar:
 			bar.set_value(GetRatio(newValue, valueMax))
 
@@ -98,6 +99,7 @@ func UpdateValue(delta):
 			remainsToFillSec = 0
 			initDelayToFillSec = 0
 			valueFrom = valueTo
+
 #
 func _ready():
 	assert(bar && label, "ProgressBar childs are missing")
@@ -105,15 +107,16 @@ func _ready():
 	if bar:
 		if textureProgress:
 			bar.texture_progress = textureProgress
-			bar.rect_size = textureProgress.get_size()
+			if anchor_bottom == anchor_top && anchor_left == anchor_right:
+				set_deferred("bar.size", textureProgress.get_size())
 		if textureBackground:
 			bar.texture_under = textureBackground
 	if label:
 		if labelScale != 1:
 			label.set_scale(Vector2(labelScale,labelScale))
-			label.rect_position.y -= ceil((1 - labelScale) * 10) 
+			label.position.y -= ceil((1 - labelScale) * 10) 
 		if labelColor:
-			label.add_color_override("font_color", labelColor)
+			label.set("custom_colors/font_color", labelColor)
 
 func _process(delta):
 	UpdateValue(delta)

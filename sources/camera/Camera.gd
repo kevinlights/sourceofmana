@@ -2,7 +2,8 @@ extends Node
 
 var mainCamera : Camera2D		= null
 
-func SetBoundaries(entity : Node2D):
+#
+func SetBoundaries(entity : CharacterBody2D):
 	if entity && entity.camera:
 		mainCamera = entity.camera
 		if mainCamera:

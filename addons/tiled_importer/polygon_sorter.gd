@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 # Sorter for polygon vertices
-tool
-extends Reference
+@tool
+extends RefCounted
 
 var center
 
@@ -40,9 +40,9 @@ func sort_polygon(vertices):
 	centroid /= size
 
 	center = centroid
-	vertices.sort_custom(self, "is_less")
+	vertices.sort_custom(is_less)
 
-	return PoolVector2Array(vertices)
+	return PackedVector2Array(vertices)
 
 # Sorter function, determines which of the poins should come first
 func is_less(a, b):

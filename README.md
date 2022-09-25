@@ -4,7 +4,7 @@ Client and Game development for Source of Mana, a The Mana World story.
 
 ## Godot versions
 
-Current version is ['Godot 3.5'](https://downloads.tuxfamily.org/godotengine/3.5/) accessible on [Godot's official website](https://godotengine.org/download).
+Current version is ['Godot 4.0 beta 1'](https://downloads.tuxfamily.org/godotengine/4.0/beta1/) accessible on [Godot's official website](https://godotengine.org/download).
 
 ## License
 
